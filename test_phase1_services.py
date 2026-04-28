@@ -3,6 +3,21 @@ Test script for Phase 1 services
 Tests Portfolio Service and Paper Trading Service
 """
 
+from pathlib import Path
+import sys
+
+CURRENT_DIR = Path(__file__).resolve().parent
+for import_path in (CURRENT_DIR, CURRENT_DIR.parent, CURRENT_DIR.parent.parent):
+    import_path_str = str(import_path)
+    if import_path_str not in sys.path:
+        sys.path.insert(0, import_path_str)
+
+from ai_trading_common.logging_config import setup_logging, get_logger
+
+setup_logging("docs")
+logger = get_logger()
+
+
 import requests
 import json
 
@@ -19,76 +34,76 @@ headers = {
 
 def test_portfolio_service():
     """Test Portfolio Management Service"""
-    print("\n" + "="*60)
-    print("TESTING PORTFOLIO SERVICE (Port 8004)")
-    print("="*60)
+    logger.info("script_output", message="\n" + "="*60)
+    logger.info("script_output", message="TESTING PORTFOLIO SERVICE (Port 8004)")
+    logger.info("script_output", message="="*60)
     
     # Test 1: Get portfolio
-    print("\n1. Getting portfolio...")
+    logger.info("script_output", message="\n1. Getting portfolio...")
     response = requests.get(f"{BASE_URL_PORTFOLIO}/api/portfolio", headers=headers)
-    print(f"Status: {response.status_code}")
+    logger.info("script_output", message=f"Status: {response.status_code}")
     if response.status_code == 200:
         data = response.json()
-        print(f"Cash: ${data.get('cash', 0):,.2f}")
-        print(f"Total Value: ${data.get('totalValue', 0):,.2f}")
-        print(f"Positions: {len(data.get('positions', []))}")
+        logger.info("script_output", message=f"Cash: ${data.get('cash', 0):,.2f}")
+        logger.info("script_output", message=f"Total Value: ${data.get('totalValue', 0):,.2f}")
+        logger.info("script_output", message=f"Positions: {len(data.get('positions', []))}")
     else:
-        print(f"Error: {response.text}")
+        logger.error("script_output", message=f"Error: {response.text}")
     
     # Test 2: Buy stock
-    print("\n2. Buying 10 shares of AAPL...")
+    logger.info("script_output", message="\n2. Buying 10 shares of AAPL...")
     buy_data = {
         "ticker": "AAPL",
         "quantity": 10,
         "price": 150.00
     }
     response = requests.post(f"{BASE_URL_PORTFOLIO}/api/portfolio/buy", headers=headers, json=buy_data)
-    print(f"Status: {response.status_code}")
+    logger.info("script_output", message=f"Status: {response.status_code}")
     if response.status_code == 200:
-        print(f"Response: {response.json()}")
+        logger.info("script_output", message=f"Response: {response.json()}")
     else:
-        print(f"Error: {response.text}")
+        logger.error("script_output", message=f"Error: {response.text}")
     
     # Test 3: Get updated portfolio
-    print("\n3. Getting updated portfolio...")
+    logger.info("script_output", message="\n3. Getting updated portfolio...")
     response = requests.get(f"{BASE_URL_PORTFOLIO}/api/portfolio", headers=headers)
     if response.status_code == 200:
         data = response.json()
-        print(f"Cash: ${data.get('cash', 0):,.2f}")
-        print(f"Total Value: ${data.get('totalValue', 0):,.2f}")
-        print(f"Positions: {len(data.get('positions', []))}")
+        logger.info("script_output", message=f"Cash: ${data.get('cash', 0):,.2f}")
+        logger.info("script_output", message=f"Total Value: ${data.get('totalValue', 0):,.2f}")
+        logger.info("script_output", message=f"Positions: {len(data.get('positions', []))}")
         for pos in data.get('positions', []):
-            print(f"  - {pos['ticker']}: {pos['quantity']} shares @ ${pos['avgCostBasis']:.2f}")
+            logger.info("script_output", message=f"  - {pos['ticker']}: {pos['quantity']} shares @ ${pos['avgCostBasis']:.2f}")
     
     # Test 4: Get transactions
-    print("\n4. Getting transaction history...")
+    logger.info("script_output", message="\n4. Getting transaction history...")
     response = requests.get(f"{BASE_URL_PORTFOLIO}/api/portfolio/transactions", headers=headers)
     if response.status_code == 200:
         data = response.json()
-        print(f"Total transactions: {len(data.get('transactions', []))}")
+        logger.info("script_output", message=f"Total transactions: {len(data.get('transactions', []))}")
         for txn in data.get('transactions', [])[:3]:
-            print(f"  - {txn['type']} {txn['quantity']} {txn['ticker']} @ ${txn['price']:.2f}")
+            logger.info("script_output", message=f"  - {txn['type']} {txn['quantity']} {txn['ticker']} @ ${txn['price']:.2f}")
 
 def test_paper_trading_service():
     """Test Paper Trading Service"""
-    print("\n" + "="*60)
-    print("TESTING PAPER TRADING SERVICE (Port 8005)")
-    print("="*60)
+    logger.info("script_output", message="\n" + "="*60)
+    logger.info("script_output", message="TESTING PAPER TRADING SERVICE (Port 8005)")
+    logger.info("script_output", message="="*60)
     
     # Test 1: Get account
-    print("\n1. Getting paper trading account...")
+    logger.info("script_output", message="\n1. Getting paper trading account...")
     response = requests.get(f"{BASE_URL_PAPER}/api/paper/account", headers=headers)
-    print(f"Status: {response.status_code}")
+    logger.info("script_output", message=f"Status: {response.status_code}")
     if response.status_code == 200:
         data = response.json()
-        print(f"Cash: ${data.get('cash', 0):,.2f}")
-        print(f"Total Value: ${data.get('totalValue', 0):,.2f}")
-        print(f"Positions: {len(data.get('positions', []))}")
+        logger.info("script_output", message=f"Cash: ${data.get('cash', 0):,.2f}")
+        logger.info("script_output", message=f"Total Value: ${data.get('totalValue', 0):,.2f}")
+        logger.info("script_output", message=f"Positions: {len(data.get('positions', []))}")
     else:
-        print(f"Error: {response.text}")
+        logger.error("script_output", message=f"Error: {response.text}")
     
     # Test 2: Place market buy order
-    print("\n2. Placing market buy order for 5 shares of MSFT...")
+    logger.info("script_output", message="\n2. Placing market buy order for 5 shares of MSFT...")
     import time
     time.sleep(2)  # Small delay to avoid rate limiting
     order_data = {
@@ -98,56 +113,56 @@ def test_paper_trading_service():
         "quantity": 5
     }
     response = requests.post(f"{BASE_URL_PAPER}/api/paper/order", headers=headers, json=order_data)
-    print(f"Status: {response.status_code}")
+    logger.info("script_output", message=f"Status: {response.status_code}")
     if response.status_code == 200:
         data = response.json()
-        print(f"Order ID: {data.get('orderId')}")
-        print(f"Status: {data.get('status')}")
+        logger.info("script_output", message=f"Order ID: {data.get('orderId')}")
+        logger.info("script_output", message=f"Status: {data.get('status')}")
         if data.get('filledPrice'):
-            print(f"Filled Price: ${data.get('filledPrice'):.2f}")
-        print(f"Message: {data.get('message')}")
+            logger.info("script_output", message=f"Filled Price: ${data.get('filledPrice'):.2f}")
+        logger.info("script_output", message=f"Message: {data.get('message')}")
     else:
-        print(f"Error: {response.text}")
+        logger.error("script_output", message=f"Error: {response.text}")
     
     # Test 3: Get updated account
-    print("\n3. Getting updated account...")
+    logger.info("script_output", message="\n3. Getting updated account...")
     response = requests.get(f"{BASE_URL_PAPER}/api/paper/account", headers=headers)
     if response.status_code == 200:
         data = response.json()
-        print(f"Cash: ${data.get('cash', 0):,.2f}")
-        print(f"Total Value: ${data.get('totalValue', 0):,.2f}")
-        print(f"Total P&L: ${data.get('totalPL', 0):,.2f} ({data.get('totalPLPercent', 0):.2f}%)")
+        logger.info("script_output", message=f"Cash: ${data.get('cash', 0):,.2f}")
+        logger.info("script_output", message=f"Total Value: ${data.get('totalValue', 0):,.2f}")
+        logger.info("script_output", message=f"Total P&L: ${data.get('totalPL', 0):,.2f} ({data.get('totalPLPercent', 0):.2f}%)")
         for pos in data.get('positions', []):
-            print(f"  - {pos['ticker']}: {pos['quantity']} shares @ ${pos['avgCostBasis']:.2f}")
+            logger.info("script_output", message=f"  - {pos['ticker']}: {pos['quantity']} shares @ ${pos['avgCostBasis']:.2f}")
     
     # Test 4: Get order history
-    print("\n4. Getting order history...")
+    logger.info("script_output", message="\n4. Getting order history...")
     response = requests.get(f"{BASE_URL_PAPER}/api/paper/orders", headers=headers)
     if response.status_code == 200:
         data = response.json()
-        print(f"Total orders: {len(data.get('orders', []))}")
+        logger.info("script_output", message=f"Total orders: {len(data.get('orders', []))}")
         for order in data.get('orders', [])[:3]:
-            print(f"  - {order['side'].upper()} {order['quantity']} {order['ticker']} @ ${order['filledPrice']:.2f}")
+            logger.info("script_output", message=f"  - {order['side'].upper()} {order['quantity']} {order['ticker']} @ ${order['filledPrice']:.2f}")
 
 def main():
     """Run all tests"""
-    print("\n" + "="*60)
-    print("PHASE 1 SERVICES TEST SUITE")
-    print("="*60)
+    logger.info("script_output", message="\n" + "="*60)
+    logger.info("script_output", message="PHASE 1 SERVICES TEST SUITE")
+    logger.info("script_output", message="="*60)
     
     try:
         test_portfolio_service()
     except Exception as e:
-        print(f"\n❌ Portfolio Service Error: {e}")
+        logger.error("script_output", message=f"\n❌ Portfolio Service Error: {e}")
     
     try:
         test_paper_trading_service()
     except Exception as e:
-        print(f"\n❌ Paper Trading Service Error: {e}")
+        logger.error("script_output", message=f"\n❌ Paper Trading Service Error: {e}")
     
-    print("\n" + "="*60)
-    print("TEST SUITE COMPLETE")
-    print("="*60)
+    logger.info("script_output", message="\n" + "="*60)
+    logger.info("script_output", message="TEST SUITE COMPLETE")
+    logger.info("script_output", message="="*60)
 
 if __name__ == "__main__":
     main()
